@@ -159,7 +159,8 @@ begin
 
     wad <= ins(15 downto 12) when wadselect = "01" else 
            ins(19 downto 16) when wadselect = "10" else
-           "1111";
+           "1111" when wadselect = "11" else
+           "1110";
 
     wd <= RES when wdselect = '0' else DR ;
 
