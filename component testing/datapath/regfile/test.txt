@@ -1,0 +1,13 @@
+add_force {/RegisterFile/read_addressA} -radix hex {0 0ns}
+add_force {/RegisterFile/read_addressB} -radix hex {0 0ns}
+add_force {/RegisterFile/write_data} -radix hex {12345678 0ns}
+add_force {/RegisterFile/write_address} -radix hex {1 0ns}
+add_force {/RegisterFile/clock} -radix hex {1 0ns} {0 50000ps} -repeat_every 100000ps
+add_force {/RegisterFile/write_enable} -radix hex {1 0ns}
+run 200 ns
+add_force {/RegisterFile/write_address} -radix hex {f 0ns}
+add_force {/RegisterFile/read_addressB} -radix hex {1 0ns}
+run 200 ns
+add_force {/RegisterFile/write_enable} -radix hex {0 0ns}
+add_force {/RegisterFile/reset} -radix hex {1 0ns}
+run 200 ns

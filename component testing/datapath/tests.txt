@@ -1,0 +1,28 @@
+---- testing Processor Memory Path ----
+
+1. ldrh
+
+add_force {/ProcessorMemoryPath/processorIn} -radix hex {0ffffff0 0ns}
+add_force {/ProcessorMemoryPath/memoryIn} -radix hex {0ffffff0 0ns}
+add_force {/ProcessorMemoryPath/mode} -radix bin {001 0ns}
+add_force {/ProcessorMemoryPath/byteOffset} -radix hex {0 0ns}
+run 20 us
+
+2. strb
+
+add_force {/ProcessorMemoryPath/mode} -radix bin {111 0ns}
+run 20 us
+
+---- testing ALU ----
+
+1. and
+
+add_force {/ALU/mode} -radix bin {0001 0ns}
+add_force {/ALU/operand1} -radix hex {0ffffff0 0ns}
+add_force {/ALU/operand2} -radix hex {00ff00ff00 0ns}
+run 20 us
+
+2. add
+
+add_force {/ALU/mode} -radix bin {0100 0ns}
+run 20 us

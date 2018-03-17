@@ -1,0 +1,15 @@
+add_force {/shifter/input} -radix hex {12345678 0ns}
+add_force {/shifter/shift_amount} -radix hex {4 0ns}
+add_force {/shifter/shift_type} -radix hex {1 0ns}
+run 200 ns
+add_force {/shifter/shift_type} -radix hex {3 0ns}
+run 200 ns
+add_force {/shifter/shift_type} -radix hex {2 0ns}
+run 200 ns
+add_force {/shifter/shift_type} -radix hex {0 0ns}
+run 200 ns
+
+add_force {/shifter/input} -radix hex {12345678 0ns}
+add_force {/shifter/shift_amount} -radix hex {4 0ns}
+add_force {/shifter/shift_type} -radix hex {0 0ns}
+run 200 ns

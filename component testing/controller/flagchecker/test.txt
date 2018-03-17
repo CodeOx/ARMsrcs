@@ -1,0 +1,16 @@
+add_force {/flagchecker/N} -radix hex {0 0ns}
+add_force {/flagchecker/Z} -radix hex {1 0ns}
+add_force {/flagchecker/C} -radix hex {0 0ns}
+add_force {/flagchecker/V} -radix hex {1 0ns}
+add_force {/flagchecker/condition} -radix hex {0 0ns}
+run 2 ns
+add_force {/flagchecker/condition} -radix hex {1101 0ns}
+
+add_force {/flagchecker/condition} -radix bin {1101 0ns}
+run 2 ns
+add_force {/flagchecker/condition} -radix bin {1100 0ns}
+run 2 ns
+add_force {/flagchecker/condition} -radix bin {1110 0ns}
+run 2 ns
+add_force {/flagchecker/condition} -radix bin {1111 0ns}
+run 2 ns
