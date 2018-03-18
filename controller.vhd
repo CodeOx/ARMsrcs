@@ -71,10 +71,21 @@ architecture Behavioral of controller is
               );
      end component;
      
+     component instructiondecoder is
+         Port ( ins : in STD_LOGIC_VECTOR (31 downto 0);
+                ins_type : out STD_LOGIC_VECTOR (1 downto 0);
+                ins_subtype : out STD_LOGIC_VECTOR (2 downto 0);
+                ins_variant : out STD_LOGIC_VECTOR (1 downto 0);
+                undefined_encoding: out STD_LOGIC);
+     end component;
+     
     signal predicationResult : STD_LOGIC;
     signal undefined_ins : STD_LOGIC;
     signal undefined_predication : STD_LOGIC;
+    signal undefined_encoding : STD_LOGIC;
     signal ins_type : STD_LOGIC_VECTOR(1 downto 0);
+    signal ins_subtype : STD_LOGIC_VECTOR(2 downto 0);
+    signal ins_variant : STD_LOGIC_VECTOR(1 downto 0);
     signal state : STD_LOGIC_VECTOR(3 downto 0);
 
 begin
@@ -96,7 +107,23 @@ begin
              );
              
     --alu control             
-    
+     ALUControl : aluctrl
+     Port Map(condition => instruction (24 downto 21),
+              ins_type => ins_type, 
+              alu_signal => ALUmode
+             );
+             
+    --instruction decoder
+    IRDecoder : instructiondecoder
+    Port Map (  ins => instruction,
+                ins_type => ins_type,
+                ins_subtype => ins_subtype,
+                ins_variant => ins_variant,
+                undefined_encoding =>undefined_encoding);
+                
+                
+    undefined_ins <= undefined_encoding or undefined_predication;             
+            
     memoryReadEnable <= '1';
    
     --generating control signals from state and instruction -> combinational
