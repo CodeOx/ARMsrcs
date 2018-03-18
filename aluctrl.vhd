@@ -21,9 +21,23 @@ begin
 process (condition,ins_type)
 begin
     if ins_type = "00" then
-        case condition is 
-            when "0000" => alu_signal <= "0000";
-        end case;
+        alu_signal<= condition;
+    elsif ins_type ="01" then
+        if condition(2)='1' then
+            alu_signal <= "0100";
+        else 
+            alu_signal <= "0010";
+        end if;
+   elsif ins_type="11" then
+        alu_signal <= "0100";
+   else
+        if condition(0)='0' then
+            alu_signal <= "1101";
+        else
+            alu_signal <= "0100";
+        end if;
+   end if;
+         
 end process;
 
 

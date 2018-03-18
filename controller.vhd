@@ -53,9 +53,49 @@ architecture Behavioral of controller is
          state : out STD_LOGIC_VECTOR(3 downto 0));
     end Component;
 
+    component flagchecker
+    Port (  N : in STD_LOGIC;
+            Z : in STD_LOGIC;
+            C : in STD_LOGIC;
+            V : in STD_LOGIC;
+            condition : in STD_LOGIC_VECTOR(3 downto 0);
+            result : out STD_LOGIC;
+            undefined : out STD_LOGIC
+         );
+     end component;
+     
+     component aluctrl is
+       Port (condition : in STD_LOGIC_VECTOR(3 downto 0); --instruction bits (24 downto 21);
+             ins_type : in STD_LOGIC_VECTOR(1 downto 0); --from instruction decoder 
+             alu_signal : out STD_LOGIC_VECTOR (3 downto 0)
+              );
+     end component;
+     
+    signal predicationResult : STD_LOGIC;
+    signal undefined_ins : STD_LOGIC;
+    signal undefined_predication : STD_LOGIC;
+    signal ins_type : STD_LOGIC_VECTOR(1 downto 0);
     signal state : STD_LOGIC_VECTOR(3 downto 0);
 
 begin
+    --state controller    
+    stateController : ControllerFSM
+    Port Map ( clk => clk,
+               ins => instruction,
+               state => state);
+             
+    --condition checker
+    conditionChecker : flagchecker 
+    Port Map (  N => flagN,
+                Z => flagZ,
+                C => flagC,
+                V => flagV,
+                condition => instruction (24 downto 21),
+                result => predicationResult,
+                undefined => undefined_predication
+             );
+             
+    --alu control             
     
     memoryReadEnable <= '1';
    
@@ -99,11 +139,7 @@ begin
     
     wdselect <= '0';
     
-    --state controller    
-    stateController : ControllerFSM
-    Port Map ( clk => clk,
-               ins => instruction,
-               state => state);
+    
 
 
 end Behavioral;
