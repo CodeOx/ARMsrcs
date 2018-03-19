@@ -13,6 +13,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity controller is
   Port(reset : in STD_LOGIC;
       clk : in STD_LOGIC;
+      start : in STD_LOGIC;
       --control signals :
       carry : out STD_LOGIC;
       memoryReadEnable : out STD_LOGIC;
@@ -49,8 +50,13 @@ end controller;
 architecture Behavioral of controller is
     Component ControllerFSM
     Port ( clk : in  STD_LOGIC;
-         ins : in STD_LOGIC_VECTOR(31 downto 0);
-         state : out STD_LOGIC_VECTOR(3 downto 0));
+           reset : in STD_LOGIC;
+           start : in STD_LOGIC;
+           ins_type : in STD_LOGIC_VECTOR (1 downto 0);
+           ins_subtype : in STD_LOGIC_VECTOR (2 downto 0);
+           ins_variant : in STD_LOGIC_VECTOR (1 downto 0);
+           skip_ins : in STD_LOGIC;
+           state : out STD_LOGIC_VECTOR(3 downto 0));
     end Component;
 
     component flagchecker
@@ -65,7 +71,7 @@ architecture Behavioral of controller is
      end component;
      
      component aluctrl is
-       Port (condition : in STD_LOGIC_VECTOR(3 downto 0); --instruction bits (24 downto 21);
+     Port (  condition : in STD_LOGIC_VECTOR(3 downto 0); --instruction bits (24 downto 21);
              ins_type : in STD_LOGIC_VECTOR(1 downto 0); --from instruction decoder 
              alu_signal : out STD_LOGIC_VECTOR (3 downto 0)
               );
@@ -86,13 +92,20 @@ architecture Behavioral of controller is
     signal ins_type : STD_LOGIC_VECTOR(1 downto 0);
     signal ins_subtype : STD_LOGIC_VECTOR(2 downto 0);
     signal ins_variant : STD_LOGIC_VECTOR(1 downto 0);
+    signal alu_signal : STD_LOGIC_VECTOR(3 downto 0);
+    signal skip_ins : STD_LOGIC;
     signal state : STD_LOGIC_VECTOR(3 downto 0);
 
 begin
     --state controller    
     stateController : ControllerFSM
     Port Map ( clk => clk,
-               ins => instruction,
+               reset => reset,
+               start => start,
+               ins_type => ins_type,
+               ins_subtype => ins_subtype,
+               ins_variant => ins_variant,
+               skip_ins => skip_ins,
                state => state);
              
     --condition checker
@@ -110,7 +123,7 @@ begin
      ALUControl : aluctrl
      Port Map(condition => instruction (24 downto 21),
               ins_type => ins_type, 
-              alu_signal => ALUmode
+              alu_signal => alu_signal
              );
              
     --instruction decoder
@@ -122,7 +135,9 @@ begin
                 undefined_encoding =>undefined_encoding);
                 
                 
-    undefined_ins <= undefined_encoding or undefined_predication;             
+    undefined_ins <= undefined_encoding or undefined_predication; 
+    
+    --carry : out STD_LOGIC;            
             
     memoryReadEnable <= '1';
    
@@ -136,15 +151,16 @@ begin
     
     --DRenable <=;
     
-    RESenable <= '1' when state = "0000" or state = "0010" or state = "0011" else '0';
+    RESenable <= '1' when state = "0000" or state = "0010" or state = "0011" or state = "0110" or state = "1011" else '0';
     
-    RFenable <= '1' when state = "0001" or state = "0011" or state = "0100" or state = "0101" else '0';
+    RFenable <= '1' when state = "0001" or state = "0011" or state = "0100" or state = "0101" or (state = "0111" and predicationResult = '1') or state = "1100" 
+                else '0';
     
-    Aenable <= '1' when state = "0001" else '0';
+    Aenable <= '1' when state = "0001" or state = "1000" or state = "1010" else '0';
     
     Benable <= '1' when state = "0001" else '0';
     
-    --Menable : out STD_LOGIC;
+    Menable <= '1' when state = "1001" else '0';
     
     --PMPathMode : out STD_LOGIC_VECTOR(2 downto 0);
     
@@ -152,21 +168,33 @@ begin
     
     ALUop1select <= '0' when state = "0000" or state = "0010" or state = "0011" else '1';
     
-    ALUop2select <= "001" when state = "0000" or state = "0010" else  
+    ALUop2select <= "001" when state = "0000" or state = "0010" else
                     "011" when state = "0011" else
+                    "100" when state = "1011" else
                     "000";
+                    
+    ALUmode <= alu_signal when state = "0110" else
+               "1101" when state = "1011" and ins_subtype = "000" else  
+               "0100";
     
-    rad1select <= "00";
+    rad1select <= "00" when state = "0001" else
+                  "01" when state = "1010" else
+                  "00";
     
     rad2select <= '0';
     
-    wadselect <= "11" when state = "0001" or state = "0011" or state = "0100" else 
+    wadselect <= "11" when state = "0001" or state = "0011" or state = "0100" else
+                 "10" when state = "1100" else 
                  "00" when state = "0101" else
                  "01";
     
     wdselect <= '0';
     
+    ShiftAmountSelect <= '1' when (state = "0110" and ins_variant = "01") else '0';
+          
+    ShifterInSelect <= '1' when (state = "0110" and ins_variant = "00") else '0';
     
+    Fset <= '1' when (state = "0110" and predicationResult = '1') or (state = "1011" and predicationResult = '1') else '0'; 
 
 
 end Behavioral;

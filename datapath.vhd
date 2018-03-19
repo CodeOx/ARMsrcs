@@ -173,7 +173,7 @@ begin
               ShifterOut;
 
     MulOp1 <= A;
-    MulOp2 <= ShifterOut;
+    MulOp2 <= B;
 
     shifterIn <= B when ShifterInSelect = '0' else "000000000000000000000000" & ins(7 downto 0);
     shiftAmount <= rd1(4 downto 0) when ShiftAmountSelect = '0' and ShifterInSelect = '0' else 
