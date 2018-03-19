@@ -42,19 +42,6 @@ entity ALU is
           flagV : out STD_LOGIC;
           flagC : out STD_LOGIC);
 end ALU;
---mode : 0001 -> and
---0010 -> or
---0011 -> eor
---0100 -> add
---0101 -> sub
---0110 -> rsb
---0111 -> adc
---1000 -> sbc
---1001 -> rsc
---1010 -> bic
---1011 -> mov
---1100 -> mvn
---others -> return operand 1
 
 architecture Behavioral of ALU is
     signal temp_output : STD_LOGIC_VECTOR(31 downto 0);

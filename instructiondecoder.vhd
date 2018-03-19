@@ -10,6 +10,8 @@ entity instructiondecoder is
            undefined_encoding: out STD_LOGIC);
 end instructiondecoder;
 -- 00 DP
+--      000 test/cmp
+--      001 arith/logical
 -- variants
 --      00 imm
 --      01 imm specified shift
@@ -77,6 +79,13 @@ begin
             else
                 undefined_encoding <= '0';
             end if;  
+            
+            if ins(24 downto 23)="10" then
+                ins_subtype<="000";
+            else
+                ins_subtype <="001";
+            end if;
+            
         end if;
         
     elsif ins(27 downto 26)="01" then
