@@ -148,7 +148,7 @@ begin
 
     ALUCarry <= carry when Fset='0' else ShifterCarry;  
 
-    memoryAddress <= PC when memoryAddressSelect = '0' else ALUout;
+    memoryAddress <= PC when memoryAddressSelect = '0' else RES;
     ins <= IR;
     rad1 <= ins(19 downto 16) when rad1select = "00" else 
             ins(15 downto 12) when rad1select = "01" else

@@ -52,11 +52,12 @@ architecture Behavioral of controller is
     Port ( clk : in  STD_LOGIC;
            reset : in STD_LOGIC;
            start : in STD_LOGIC;
+           ins24to20 : in STD_LOGIC_VECTOR(4 downto 0);
            ins_type : in STD_LOGIC_VECTOR (1 downto 0);
            ins_subtype : in STD_LOGIC_VECTOR (2 downto 0);
            ins_variant : in STD_LOGIC_VECTOR (1 downto 0);
            skip_ins : in STD_LOGIC;
-           state : out STD_LOGIC_VECTOR(3 downto 0));
+           state : out STD_LOGIC_VECTOR(4 downto 0));
     end Component;
 
     component flagchecker
@@ -94,7 +95,7 @@ architecture Behavioral of controller is
     signal ins_variant : STD_LOGIC_VECTOR(1 downto 0);
     signal alu_signal : STD_LOGIC_VECTOR(3 downto 0);
     signal skip_ins : STD_LOGIC;
-    signal state : STD_LOGIC_VECTOR(3 downto 0);
+    signal state : STD_LOGIC_VECTOR(4 downto 0);
 
 begin
     --state controller    
@@ -102,6 +103,7 @@ begin
     Port Map ( clk => clk,
                reset => reset,
                start => start,
+               ins24to20 => instruction (24 downto 20),
                ins_type => ins_type,
                ins_subtype => ins_subtype,
                ins_variant => ins_variant,
@@ -143,58 +145,70 @@ begin
    
     --generating control signals from state and instruction -> combinational
     
-    --memoryWriteEnable : out STD_LOGIC;
+    memoryWriteEnable <= '1' when state = "01111" and predicationResult = '1' else '0';
     
-    memoryAddressSelect <= '0' when state = "0000" else '1';
+    memoryAddressSelect <= '0' when state = "00000" else '1';
     
-    IRenable <= '1' when state = "0000" else '0';
+    IRenable <= '1' when state = "00000" else '0';
     
-    --DRenable <=;
+    DRenable <= '1' when state = "10001" else '0';
     
-    RESenable <= '1' when state = "0000" or state = "0010" or state = "0011" or state = "0110" or state = "1011" else '0';
+    RESenable <= '1' when state = "00000" or state = "00010" or state = "00011" or state = "00110" or state = "01011" or state = "01101" or 
+                 (state = "10000" and instruction (21) = '1') or
+                 state = "10011"
+                 else '0';
     
-    RFenable <= '1' when state = "0001" or state = "0011" or state = "0100" or state = "0101" or (state = "0111" and predicationResult = '1') or state = "1100" 
+    RFenable <= '1' when state = "00001" or 
+                    (state = "00011" and predicationResult = '1') or 
+                    (state = "00100" and predicationResult = '1') or
+                    (state = "00101" and predicationResult = '1') or 
+                    (state = "00111" and predicationResult = '1') or 
+                    (state = "01100" and predicationResult = '1') or
+                    (state = "10010" and predicationResult = '1')
                 else '0';
     
-    Aenable <= '1' when state = "0001" or state = "1000" or state = "1010" else '0';
+    Aenable <= '1' when state = "00001" or state = "01000" or state = "01010" else '0';
     
-    Benable <= '1' when state = "0001" else '0';
+    Benable <= '1' when state = "00001" or state = "01110" else '0';
     
-    Menable <= '1' when state = "1001" else '0';
+    Menable <= '1' when state = "01001" else '0';
     
-    --PMPathMode : out STD_LOGIC_VECTOR(2 downto 0);
+    PMPathMode <= ins_subtype;
     
-    --PMPathByteOffset : out STD_LOGIC_VECTOR(1 downto 0);
+    PMPathByteOffset <= "00";
     
-    ALUop1select <= '0' when state = "0000" or state = "0010" or state = "0011" else '1';
+    ALUop1select <= '0' when state = "00000" or state = "00010" or state = "00011" else '1';
     
-    ALUop2select <= "001" when state = "0000" or state = "0010" else
-                    "011" when state = "0011" else
-                    "100" when state = "1011" else
+    ALUop2select <= "001" when state = "00000" or state = "00010" else
+                    "010" when state = "01101" and ins_variant = "00" else
+                    "011" when state = "00011" else
+                    "100" when state = "01011" else
                     "000";
                     
-    ALUmode <= alu_signal when state = "0110" else
-               "1101" when state = "1011" and ins_subtype = "000" else  
+    ALUmode <= alu_signal when state = "00110" else
+               "1101" when state = "01011" and ins_subtype = "000" else 
+               "0010" when state = "01101" and instruction(23) = '0' else
+               --to pass op1 when state = "10011" else 
                "0100";
     
-    rad1select <= "00" when state = "0001" else
-                  "01" when state = "1010" else
+    rad1select <= "00" when state = "00001" else
+                  "01" when state = "01010" else
                   "00";
     
-    rad2select <= '0';
+    rad2select <= '1' when state = "01110" else '0';
     
-    wadselect <= "11" when state = "0001" or state = "0011" or state = "0100" else
-                 "10" when state = "1100" else 
-                 "00" when state = "0101" else
+    wadselect <= "11" when state = "00001" or state = "00011" or state = "00100" else
+                 "10" when state = "01100" or state = "10000" else 
+                 "00" when state = "00101" else
                  "01";
     
-    wdselect <= '0';
+    wdselect <= '1' when state = "10010" else '0';
     
-    ShiftAmountSelect <= '1' when (state = "0110" and ins_variant = "01") else '0';
+    ShiftAmountSelect <= '1' when (state = "00110" and ins_variant = "01") or state = "01101" else '0';
           
-    ShifterInSelect <= '1' when (state = "0110" and ins_variant = "00") else '0';
+    ShifterInSelect <= '1' when (state = "00110" and ins_variant = "00") else '0';
     
-    Fset <= '1' when (state = "0110" and predicationResult = '1') or (state = "1011" and predicationResult = '1') else '0'; 
+    Fset <= '1' when (state = "00110" and predicationResult = '1') or (state = "01011" and predicationResult = '1') else '0'; 
 
 
 end Behavioral;

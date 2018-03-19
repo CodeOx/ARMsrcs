@@ -35,30 +35,38 @@ entity ControllerFSM is
   Port ( clk : in  STD_LOGIC;
          reset : in STD_LOGIC;
          start : in STD_LOGIC;
+         ins24to20 : in STD_LOGIC_VECTOR(4 downto 0);
          ins_type : in STD_LOGIC_VECTOR (1 downto 0);
          ins_subtype : in STD_LOGIC_VECTOR (2 downto 0);
          ins_variant : in STD_LOGIC_VECTOR (1 downto 0);
          skip_ins : in STD_LOGIC;
-         state : out STD_LOGIC_VECTOR(3 downto 0));
+         state : out STD_LOGIC_VECTOR(4 downto 0));
 end ControllerFSM;
 
 architecture Behavioral of ControllerFSM is
 
     TYPE State_type IS (
-        InstructionFetch_PCincrement, --0000
-        PCupdate_LoadAB, --0001 
-        Branch_IncrementPCby4, --0010
-        Branch_updatePC_addOffset, --0011
-        Branch_updatePCafterOffset, --0100
-        Branch_updateLR, --0101
-        DP_shiftOp2_updateRES_flags, --0110
-        DP_writeBack, --0111
-        MulMla_loadRs, --1000
-        MulMla_updateM, --1001
-        MulMla_loadRn, --1010
-        MulMla_updateRES_flags, --1011
-        MulMla_writeBack, --1100
-        Idle --1111
+        InstructionFetch_PCincrement, --00000
+        PCupdate_LoadAB, --00001 
+        Branch_IncrementPCby4, --00010
+        Branch_updatePC_addOffset, --00011
+        Branch_updatePCafterOffset, --00100
+        Branch_updateLR, --00101
+        DP_shiftOp2_updateRES_flags, --00110
+        DP_writeBack, --00111
+        MulMla_loadRs, --01000
+        MulMla_updateM, --01001
+        MulMla_loadRn, --01010
+        MulMla_updateRES_flags, --01011
+        MulMla_writeBack, --01100
+        DT_preIndex_CalcAddress, --01101
+        DT_str_loadRd, --01110
+        DT_str, --01111
+        DT_writeBack, --10000
+        DT_loadDR, --10001
+        DT_ldr_writeIntoRF, --10010
+        DT_postIndex_CalcAddress, --10011
+        Idle --11111
         );
     
     signal currentState : State_Type := Idle;    -- Create a signal that uses
@@ -90,6 +98,10 @@ begin
                         
                         if ins_type = "00" then
                             currentState <= DP_shiftOp2_updateRES_flags;
+                        elsif (ins_type = "01" and ins24to20(4) = '1') then
+                            currentState <= DT_preIndex_CalcAddress;
+                        elsif (ins_type = "01" and ins24to20(4) = '0') then
+                            currentState <= DT_postIndex_CalcAddress;
                         elsif ins_type = "10" then
                             currentState <= MulMla_LoadRs;
                         elsif ins_type = "11" then
@@ -138,6 +150,39 @@ begin
                 when MulMla_writeBack =>
                     currentState <= InstructionFetch_PCincrement;
                     
+                when DT_preIndex_CalcAddress =>
+                    if ins_subtype ="101" or ins_subtype = "111" or ins_subtype = "110" then
+                        currentState <= DT_str_loadRd;
+                    else
+                        currentState <= DT_loadDR;
+                    end if;
+                    
+                when DT_loadDR =>
+                    currentState <= DT_ldr_writeIntoRF;
+                    
+                when DT_ldr_writeIntoRF =>
+                    if ins24to20(4) = '1' then
+                        currentState <= DT_writeBack;
+                    end if;
+                    
+                when DT_str_loadRd =>
+                    currentState <= DT_str;
+                    
+                when DT_str =>
+                    if ins24to20(4) = '1' then
+                        currentState <= DT_writeBack;
+                    end if;
+                    
+                when DT_writeBack =>
+                    currentState <= InstructionFetch_PCincrement;
+                    
+                when DT_postIndex_CalcAddress =>
+                    if ins_subtype ="101" or ins_subtype = "111" or ins_subtype = "110" then
+                        currentState <= DT_str_loadRd;
+                    else
+                        currentState <= DT_loadDR;
+                    end if; 
+                
                 when others => currentState <= Idle;               
                 
             end case;
