@@ -70,8 +70,31 @@ architecture Behavioral of ControllerFSM is
         );
     
     signal currentState : State_Type := Idle;    -- Create a signal that uses
-
+        
 begin
+
+    with currentState select state <= 
+        "00000" when InstructionFetch_PCincrement, --00000
+        "00001" when PCupdate_LoadAB, --00001 
+        "00010" when Branch_IncrementPCby4, --00010
+        "00011" when Branch_updatePC_addOffset, --00011
+        "00100" when Branch_updatePCafterOffset, --00100
+        "00101" when Branch_updateLR, --00101
+        "00110" when DP_shiftOp2_updateRES_flags, --00110
+        "00111" when DP_writeBack, --00111
+        "01000" when MulMla_loadRs, --01000
+        "01001" when MulMla_updateM, --01001
+        "01010" when MulMla_loadRn, --01010
+        "01011" when MulMla_updateRES_flags, --01011
+        "01100" when MulMla_writeBack, --01100
+        "01101" when DT_preIndex_CalcAddress, --01101
+        "01110" when DT_str_loadRd, --01110
+        "01111" when DT_str, --01111
+        "10000" when DT_writeBack, --10000
+        "10001" when DT_loadDR, --10001
+        "10010" when DT_ldr_writeIntoRF, --10010
+        "10011" when DT_postIndex_CalcAddress, --10011
+        "11111" when Idle; --11111
 
     process(clk,reset)
     begin
