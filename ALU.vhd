@@ -67,7 +67,7 @@ begin
         (operand1 or operand2) when "1100",
         operand2 when "1101",
         (operand1 and (not(operand2))) when "1110",
-        (not operand2) when "1111";
+        (not operand2) when others;
         
         
     c31 <= operand1(31) xor operand2(31) xor temp_output(31);
