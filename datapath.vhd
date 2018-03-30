@@ -91,7 +91,7 @@ architecture Behavioral of datapath is
     end component;
     
     component bram_wrapper
-    Port ( addra : in STD_LOGIC_VECTOR ( 10 downto 0 );
+    Port ( addra : in STD_LOGIC_VECTOR ( 31 downto 0 );
             rsta : in STD_LOGIC;
             clka : in STD_LOGIC;
             dina : in STD_LOGIC_VECTOR ( 31 downto 0 );
@@ -196,11 +196,11 @@ begin
                  "0010" when PMPathMode="111" and PMPathByteOffset="01" else
                  "0100" when PMPathMode="111" and PMPathByteOffset="10" else
                  "1000" when PMPathMode="111" and PMPathByteOffset="11" else
-                 "1111";
+                 "1111" when memoryWriteEnable = '1';
     MemoryEna <= (memoryReadEnable or memoryWriteEnable);
     
     memory : bram_wrapper
-    Port Map (  addra => memoryAddress(10 downto 0),
+    Port Map (  addra => memoryAddress,
                 clka => clk,
                 rsta => reset,
                 dina => dataToMemory,
@@ -268,7 +268,8 @@ begin
     end process;
     process (clk)
     begin
-        if rising_edge(clk) and RESenable = '1' then
+        --if rising_edge(clk) and RESenable = '1' then
+        if clk = '1' and clk'event and RESenable = '1' then
             RES <= ALUout;
         end if;
     end process;
