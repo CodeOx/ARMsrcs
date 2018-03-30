@@ -66,6 +66,8 @@ architecture Behavioral of ControllerFSM is
         DT_loadDR, --10001
         DT_ldr_writeIntoRF, --10010
         DT_postIndex_CalcAddress, --10011
+        InstructionFetch_memoryWait, --10100
+        InstructionFetch_instructionStore, --10101
         Idle --11111
         );
     
@@ -94,6 +96,8 @@ begin
         "10001" when DT_loadDR, --10001
         "10010" when DT_ldr_writeIntoRF, --10010
         "10011" when DT_postIndex_CalcAddress, --10011
+        "10100" when InstructionFetch_memoryWait,
+        "10101" when InstructionFetch_instructionStore,
         "11111" when Idle; --11111
 
     process(clk,reset)
@@ -112,6 +116,12 @@ begin
                     end if;
                 
                 when  InstructionFetch_PCincrement => 
+                    currentState <= InstructionFetch_memoryWait;
+                    
+                when InstructionFetch_memoryWait =>
+                    currentState <= InstructionFetch_instructionStore;
+                    
+                when InstructionFetch_instructionStore =>
                     currentState <= PCupdate_LoadAB;
                     
                 when PCupdate_LoadAB =>
@@ -157,6 +167,9 @@ begin
                     else
                         currentState <= InstructionFetch_PCincrement;
                     end if;   
+                    
+                when DP_writeBack =>
+                    currentState <= InstructionFetch_PCincrement;                    
                     
                 when MulMla_loadRs =>
                     currentState <= MulMla_updateM;

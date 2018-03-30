@@ -6,7 +6,8 @@ entity processor is
         reset: in STD_LOGIC;
         start: in STD_LOGIC;
         debug_controls : in STD_LOGIC_VECTOR(3 downto 0);
-        debug_out : out STD_LOGIC_VECTOR(31 downto 0) );
+        debug_out : out STD_LOGIC_VECTOR(31 downto 0);
+        state : out STD_LOGIC_VECTOR(4 downto 0) );
 end processor;
 
         
@@ -46,7 +47,8 @@ architecture Behavioral of processor is
           flagZ : in STD_LOGIC;
           flagN : in STD_LOGIC;
           flagV : in STD_LOGIC;
-          flagC : in STD_LOGIC );
+          flagC : in STD_LOGIC;
+          state_out : out STD_LOGIC_VECTOR(4 downto 0) );
     end component;
     
     component datapath
@@ -111,6 +113,8 @@ architecture Behavioral of processor is
     signal ShifterSelect :  STD_LOGIC;
     signal Fset :  STD_LOGIC;
     signal instruction :  STD_LOGIC_VECTOR(31 downto 0);
+    signal instructionFromDatapath :  STD_LOGIC_VECTOR(31 downto 0);
+    signal state_temp : STD_LOGIC_VECTOR(4 downto 0);
     signal flagZ :  STD_LOGIC;
     signal flagN :  STD_LOGIC;
     signal flagV :  STD_LOGIC;
@@ -143,7 +147,7 @@ begin
             ShiftAmountSelect => ShiftAmountSelect,
             ShifterInSelect => ShifterSelect,
             Fset => Fset,
-            instruction => instruction,
+            instruction => instructionFromDatapath,
             flagZ => flagZ,
             flagN => flagN,
             flagV => flagV,
@@ -182,6 +186,18 @@ begin
             flagZ => flagZ,
             flagN => flagN,
             flagV => flagV,
-            flagC => flagC);
+            flagC => flagC,
+            state_out => state_temp);
+            
+    state <= state_temp;
+            
+    process(clk)
+    begin
+        if rising_edge(clk) then
+            if state_temp = "00001" then
+                instruction <= instructionFromDatapath;    
+            end if;
+        end if;
+    end process;
 
 end architecture;

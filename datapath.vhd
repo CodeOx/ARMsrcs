@@ -256,8 +256,9 @@ begin
     );
     process (clk)
     begin
-        if rising_edge(clk) and IRenable = '1' then
-            IR <= PMPathProcessorOut;
+        --if rising_edge(clk) and IRenable = '1' then
+        if clk = '1' and clk'event and IRenable = '1' then
+            IR <= dataFromMemory;
         end if;
     end process;
     process (clk)

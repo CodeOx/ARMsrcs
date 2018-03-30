@@ -44,7 +44,8 @@ entity controller is
       flagZ : in STD_LOGIC;
       flagN : in STD_LOGIC;
       flagV : in STD_LOGIC;
-      flagC : in STD_LOGIC );
+      flagC : in STD_LOGIC;
+      state_out : out STD_LOGIC_VECTOR(4 downto 0) );
 end controller;
 
 architecture Behavioral of controller is
@@ -98,6 +99,9 @@ architecture Behavioral of controller is
     signal state : STD_LOGIC_VECTOR(4 downto 0);
 
 begin
+    
+    state_out <= state;
+    
     --state controller    
     stateController : ControllerFSM
     Port Map ( clk => clk,
@@ -147,9 +151,9 @@ begin
     
     memoryWriteEnable <= '1' when state = "01111" and predicationResult = '1' else '0';
     
-    memoryAddressSelect <= '0' when state = "00000" else '1';
+    memoryAddressSelect <= '0' when state = "00000" or state = "10100" else '1';
     
-    IRenable <= '1' when state = "00000" else '0';
+    IRenable <= '1' when state = "10101" else '0';
     
     DRenable <= '1' when state = "10001" else '0';
     
