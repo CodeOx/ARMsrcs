@@ -34,7 +34,9 @@ entity datapath is
         flagZ : out STD_LOGIC;
         flagN : out STD_LOGIC;
         flagV : out STD_LOGIC;
-        flagC : out STD_LOGIC );
+        flagC : out STD_LOGIC;
+        debug_controls : in STD_LOGIC_VECTOR(3 downto 0);
+        debug_out : out STD_LOGIC_VECTOR(31 downto 0) );
 end datapath;
 
 architecture Behavioral of datapath is
@@ -62,12 +64,14 @@ architecture Behavioral of datapath is
     Port ( write_data : in STD_LOGIC_VECTOR (31 downto 0);
            read_addressA : in STD_LOGIC_VECTOR (3 downto 0);
            read_addressB : in STD_LOGIC_VECTOR (3 downto 0);
+           read_addressC : in STD_LOGIC_VECTOR (3 downto 0);
            write_address : in STD_LOGIC_VECTOR (3 downto 0);
            clock : in STD_LOGIC;
            reset : in STD_LOGIC;
            write_enable : in STD_LOGIC;
            read_dataA : out STD_LOGIC_VECTOR (31 downto 0);
            read_dataB : out STD_LOGIC_VECTOR (31 downto 0);
+           read_dataC : out STD_LOGIC_VECTOR (31 downto 0);
            pc : out STD_LOGIC_VECTOR (31 downto 0));
     end component;
     
@@ -211,16 +215,19 @@ begin
                carry => ShifterCarry,
                output => ShifterOut
     );    
+    
     RF : RegisterFile
     Port Map ( write_data => wd,
                read_addressA => rad1,
                read_addressB => rad2,
+               read_addressC => debug_controls,
                write_address => wad,
                clock => clk,
                reset => reset,
                write_enable => RFenable,
                read_dataA => rd1,
                read_dataB => rd2,
+               read_dataC => debug_out,
                pc => PC
     );
     PMPath : ProcessorMemoryPath

@@ -6,12 +6,14 @@ entity RegisterFile is
     Port ( write_data : in STD_LOGIC_VECTOR (31 downto 0);
            read_addressA : in STD_LOGIC_VECTOR (3 downto 0);
            read_addressB : in STD_LOGIC_VECTOR (3 downto 0);
+           read_addressC : in STD_LOGIC_VECTOR (3 downto 0);
            write_address : in STD_LOGIC_VECTOR (3 downto 0);
            clock : in STD_LOGIC;
            reset : in STD_LOGIC;
            write_enable : in STD_LOGIC;
            read_dataA : out STD_LOGIC_VECTOR (31 downto 0);
            read_dataB : out STD_LOGIC_VECTOR (31 downto 0);
+           read_dataC : out STD_LOGIC_VECTOR (31 downto 0);
            pc : out STD_LOGIC_VECTOR (31 downto 0));
 end RegisterFile;
 
@@ -22,6 +24,7 @@ signal registerfile : regArray := ((others=>'0'),(others=>'0'),(others=>'0'),(ot
 begin
     read_dataA <= registerfile(to_integer(unsigned(read_addressA)));
     read_dataB <= registerfile(to_integer(unsigned(read_addressB)));
+    read_dataC <= registerfile(to_integer(unsigned(read_addressC)));
     pc <= registerfile(15);
     process(clock)
     begin

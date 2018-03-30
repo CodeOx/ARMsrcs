@@ -4,7 +4,9 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity processor is
   Port( clk: in STD_LOGIC;
         reset: in STD_LOGIC;
-        start: in STD_LOGIC );
+        start: in STD_LOGIC;
+        debug_controls : in STD_LOGIC_VECTOR(3 downto 0);
+        debug_out : out STD_LOGIC_VECTOR(31 downto 0) );
 end processor;
 
         
@@ -80,7 +82,9 @@ architecture Behavioral of processor is
             flagZ : out STD_LOGIC;
             flagN : out STD_LOGIC;
             flagV : out STD_LOGIC;
-            flagC : out STD_LOGIC );
+            flagC : out STD_LOGIC;
+            debug_controls : in STD_LOGIC_VECTOR(3 downto 0);
+            debug_out : out STD_LOGIC_VECTOR(31 downto 0) );
     end component;
 
     signal carry :  STD_LOGIC;
@@ -143,7 +147,9 @@ begin
             flagZ => flagZ,
             flagN => flagN,
             flagV => flagV,
-            flagC => flagC);
+            flagC => flagC,
+            debug_controls => debug_controls,
+            debug_out => debug_out);
             
     processor_controller: controller
     Port Map(reset => reset,
