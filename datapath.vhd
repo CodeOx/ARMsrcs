@@ -87,13 +87,13 @@ architecture Behavioral of datapath is
     end component;
     
     component bram_wrapper
-    Port ( addra : in STD_LOGIC_VECTOR ( 31 downto 0 );
+    Port ( addra : in STD_LOGIC_VECTOR ( 10 downto 0 );
+            rsta : in STD_LOGIC;
             clka : in STD_LOGIC;
             dina : in STD_LOGIC_VECTOR ( 31 downto 0 );
             douta : out STD_LOGIC_VECTOR ( 31 downto 0 );
             ena : in STD_LOGIC;
-            rsta : in STD_LOGIC;
-            wea : in STD_LOGIC_VECTOR ( 3 downto 0 ));
+            wea : in STD_LOGIC_VECTOR(3 downto 0));
     end component;
     
     signal ins : STD_LOGIC_VECTOR(31 downto 0);
@@ -196,12 +196,12 @@ begin
     MemoryEna <= (memoryReadEnable or memoryWriteEnable);
     
     memory : bram_wrapper
-    Port Map (  addra => memoryAddress,
+    Port Map (  addra => memoryAddress(10 downto 0),
                 clka => clk,
+                rsta => reset,
                 dina => dataToMemory,
                 douta => dataFromMemory,
                 ena => MemoryEna,
-                rsta => reset,
                 wea => MemoryWea
     );
     shift : shifter
