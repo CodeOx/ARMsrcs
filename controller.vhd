@@ -120,7 +120,7 @@ begin
                 Z => flagZ,
                 C => flagC,
                 V => flagV,
-                condition => instruction (24 downto 21),
+                condition => instruction (31 downto 28),
                 result => predicationResult,
                 undefined => undefined_predication
              );

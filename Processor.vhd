@@ -113,7 +113,6 @@ architecture Behavioral of processor is
     signal ShifterSelect :  STD_LOGIC;
     signal Fset :  STD_LOGIC;
     signal instruction :  STD_LOGIC_VECTOR(31 downto 0);
-    signal instructionFromDatapath :  STD_LOGIC_VECTOR(31 downto 0);
     signal state_temp : STD_LOGIC_VECTOR(4 downto 0);
     signal flagZ :  STD_LOGIC;
     signal flagN :  STD_LOGIC;
@@ -147,7 +146,7 @@ begin
             ShiftAmountSelect => ShiftAmountSelect,
             ShifterInSelect => ShifterSelect,
             Fset => Fset,
-            instruction => instructionFromDatapath,
+            instruction => instruction,
             flagZ => flagZ,
             flagN => flagN,
             flagV => flagV,
@@ -190,14 +189,5 @@ begin
             state_out => state_temp);
             
     state <= state_temp;
-            
-    process(clk)
-    begin
-        if rising_edge(clk) then
-            if state_temp = "00001" then
-                instruction <= instructionFromDatapath;    
-            end if;
-        end if;
-    end process;
 
 end architecture;
