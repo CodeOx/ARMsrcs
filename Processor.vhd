@@ -87,7 +87,7 @@ architecture Behavioral of processor is
             flagV : out STD_LOGIC;
             flagC : out STD_LOGIC;
             debug_controls : in STD_LOGIC_VECTOR(3 downto 0);
-            debug_out : out STD_LOGIC_VECTOR(15 downto 0));
+            debug_out : out STD_LOGIC_VECTOR(31 downto 0));
             
     end component;
 
