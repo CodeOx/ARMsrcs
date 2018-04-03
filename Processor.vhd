@@ -1,13 +1,14 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+USE ieee.numeric_std.ALL; 
 
 entity processor is
   Port( clk: in STD_LOGIC;
         reset: in STD_LOGIC;
         start: in STD_LOGIC;
         debug_controls : in STD_LOGIC_VECTOR(3 downto 0);
-        debug_out : out STD_LOGIC_VECTOR(31 downto 0);
-        state : out STD_LOGIC_VECTOR(4 downto 0) );
+        debug_out : out STD_LOGIC_VECTOR(15 downto 0));
+        --state : out STD_LOGIC_VECTOR(4 downto 0) );
 end processor;
 
         
@@ -86,7 +87,8 @@ architecture Behavioral of processor is
             flagV : out STD_LOGIC;
             flagC : out STD_LOGIC;
             debug_controls : in STD_LOGIC_VECTOR(3 downto 0);
-            debug_out : out STD_LOGIC_VECTOR(31 downto 0) );
+            debug_out : out STD_LOGIC_VECTOR(15 downto 0));
+            
     end component;
 
     signal carry :  STD_LOGIC;
@@ -118,11 +120,23 @@ architecture Behavioral of processor is
     signal flagN :  STD_LOGIC;
     signal flagV :  STD_LOGIC;
     signal flagC :  STD_LOGIC;
+    signal slowclock : STD_LOGIC;
+    signal slowclockvector : STD_LOGIC_VECTOR(26 downto 0);
+    signal debug_out_internal : STD_LOGIC_VECTOR(31 downto 0) ;
 begin
+	
+	process(clk)
+	begin
+		if (rising_edge(clk)) then
+			slowclockvector <= std_logic_vector(unsigned(slowclockvector)+1);
+	   end if;
+	end process;
+    
+    slowclock<= slowclockvector(26);
 
     data_path: datapath
     Port Map(reset => reset,
-            clk => clk,
+            clk => slowclock,
             carry => carry,
             memoryReadEnable => memoryReadEnable,
             memoryWriteEnable => memoryWriteEnable,
@@ -152,11 +166,11 @@ begin
             flagV => flagV,
             flagC => flagC,
             debug_controls => debug_controls,
-            debug_out => debug_out);
+            debug_out => debug_out_internal);
             
     processor_controller: controller
     Port Map(reset => reset,
-            clk => clk,
+            clk => slowclock,
             start => start,
             carry => carry,
             memoryReadEnable => memoryReadEnable,
@@ -188,6 +202,6 @@ begin
             flagC => flagC,
             state_out => state_temp);
             
-    state <= state_temp;
+    --state <= state_temp;
 
 end architecture;
