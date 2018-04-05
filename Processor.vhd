@@ -132,7 +132,8 @@ begin
 	   end if;
 	end process;
     
-    slowclock<= slowclockvector(26);
+    slowclock<= slowclockvector(25);
+    debug_out <= debug_out_internal(15 downto 0);
 
     data_path: datapath
     Port Map(reset => reset,
