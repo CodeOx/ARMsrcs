@@ -1,6 +1,9 @@
 @move instructions
+mov r0,#12
+ldr r1,[r0]
 mov r0,#31
 mov r1,#20
+
 mvn r2,r0
 mov r3,r1,lsl #2
 

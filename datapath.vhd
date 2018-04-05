@@ -142,6 +142,7 @@ architecture Behavioral of datapath is
     signal V : STD_LOGIC;
     signal C : STD_LOGIC;
     signal MemoryWea : STD_LOGIC_VECTOR(3 downto 0);
+    signal debug_out1 : STD_LOGIC_VECTOR(31 downto 0);
     signal MemoryEna : STD_LOGIC;
 begin
     instruction <= ins;
@@ -150,7 +151,9 @@ begin
     flagV <= V;
     flagC <= C;
 
-    ALUCarry <= carry when Fset='0' else ShifterCarry;  
+    ALUCarry <= carry when Fset='0' else ShifterCarry; 
+    
+    debug_out <= debug_out1; 
 
     memoryAddress <= PC when memoryAddressSelect = '0' else RES;
     ins <= IR;
@@ -227,7 +230,7 @@ begin
                write_enable => RFenable,
                read_dataA => rd1,
                read_dataB => rd2,
-               read_dataC => debug_out,
+               read_dataC => debug_out1,
                pc => PC
     );
     PMPath : ProcessorMemoryPath

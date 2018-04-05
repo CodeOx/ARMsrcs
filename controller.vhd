@@ -158,9 +158,9 @@ begin
     
     DRenable <= '1' when state = "10001" else '0';
     
-    RESenable <= '1' when state = "00000" or state = "00010" or state = "00011" or state = "00110" or state = "01011" or state = "01101" or 
+    RESenable <= '1' when state = "00000" or state = "00010" or state = "00011" or state = "00110" or state = "01011" or (state = "01101" or state = "10111") or 
                  (state = "10000" and instruction (21) = '1') or
-                 state = "10011"
+                 state = "10011" 
                  else '0';
     
     RFenable <= '1' when state = "00001" or 
@@ -169,7 +169,8 @@ begin
                     (state = "00101" and predicationResult = '1') or 
                     (state = "00111" and predicationResult = '1') or 
                     (state = "01100" and predicationResult = '1') or
-                    (state = "10010" and predicationResult = '1')
+                    (state = "10010") or
+                    (state = "10000")
                 else '0';
     
     Aenable <= '1' when state = "00001" or state = "01000" or state = "01010" else '0';
@@ -185,14 +186,14 @@ begin
     ALUop1select <= '0' when state = "00000" or state = "00010" or state = "00011" else '1';
     
     ALUop2select <= "001" when state = "00000" or state = "00010" else
-                    "010" when state = "01101" and ins_variant = "00" else
+                    "010" when (state = "01101" or state = "10111") and ins_variant = "00" else
                     "011" when state = "00011" else
                     "100" when state = "01011" else
                     "000";
                     
     ALUmode <= alu_signal when state = "00110" else
                "1101" when state = "01011" and ins_subtype = "000" else 
-               "0010" when state = "01101" and instruction(23) = '0' else
+               "0010" when (state = "01101" or state = "10111") and instruction(23) = '0' else
                --to pass op1 when state = "10011" else 
                "0100";
     
@@ -209,7 +210,7 @@ begin
     
     wdselect <= '1' when state = "10010" else '0';
     
-    ShiftAmountSelect <= '1' when (state = "00110" and ins_variant = "01") or state = "01101" else '0';
+    ShiftAmountSelect <= '1' when (state = "00110" and ins_variant = "01") or (state = "01101" or state = "10111") else '0';
           
     ShifterInSelect <= '1' when (state = "00110" and ins_variant = "00") else '0';
     

@@ -121,7 +121,7 @@ architecture Behavioral of processor is
     signal flagV :  STD_LOGIC;
     signal flagC :  STD_LOGIC;
     signal slowclock : STD_LOGIC;
-    signal slowclockvector : STD_LOGIC_VECTOR(26 downto 0);
+    signal slowclockvector : STD_LOGIC_VECTOR(27 downto 0);
     signal debug_out_internal : STD_LOGIC_VECTOR(31 downto 0) ;
 begin
 	
@@ -132,12 +132,12 @@ begin
 	   end if;
 	end process;
     
-    slowclock<= slowclockvector(26);
+    slowclock<= slowclockvector(27);
     debug_out <= debug_out_internal(15 downto 0);
 
     data_path: datapath
     Port Map(reset => reset,
-            clk => slowclock,
+            clk => clk,
             carry => carry,
             memoryReadEnable => memoryReadEnable,
             memoryWriteEnable => memoryWriteEnable,
@@ -171,7 +171,7 @@ begin
             
     processor_controller: controller
     Port Map(reset => reset,
-            clk => slowclock,
+            clk => clk,
             start => start,
             carry => carry,
             memoryReadEnable => memoryReadEnable,

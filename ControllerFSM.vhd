@@ -69,6 +69,7 @@ architecture Behavioral of ControllerFSM is
         InstructionFetch_memoryWait, --10100
         InstructionFetch_instructionStore, --10101
         DT_str_loadRd_memoryWait, --10110
+        DT_loadDR_memoryWait, --10111
         Idle --11111
         );
     
@@ -100,6 +101,7 @@ begin
         "10100" when InstructionFetch_memoryWait,
         "10101" when InstructionFetch_instructionStore,
         "10110" when DT_str_loadRd_memoryWait,
+        "10111" when DT_loadDR_memoryWait,
         "11111" when Idle; --11111
 
     process(clk,reset)
@@ -189,11 +191,14 @@ begin
                     currentState <= InstructionFetch_PCincrement;
                     
                 when DT_preIndex_CalcAddress =>
-                    if ins_subtype ="101" or ins_subtype = "111" or ins_subtype = "110" then
-                        currentState <= DT_str_loadRd_memoryWait;
-                    else
-                        currentState <= DT_loadDR;
-                    end if;
+                    --if ins_subtype ="101" or ins_subtype = "111" or ins_subtype = "110" then
+                    --    currentState <= DT_str_loadRd_memoryWait;
+                    --else
+                        currentState <= DT_loadDR_memoryWait;
+                    --end if;
+                    
+                when DT_loadDR_memoryWait => 
+                    currentState <= DT_loadDR;
                     
                 when DT_loadDR =>
                     currentState <= DT_ldr_writeIntoRF;
