@@ -17,7 +17,7 @@ add r2,r0,r1,lsr #2
 @branch testing
 mov r0,#0
 b L
-add r0,r0,#1
+add r0,r0,#4
 L:
 add r0,r0,#1
 

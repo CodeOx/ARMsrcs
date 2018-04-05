@@ -132,7 +132,7 @@ begin
 	   end if;
 	end process;
     
-    slowclock<= slowclockvector(25);
+    slowclock<= slowclockvector(26);
     debug_out <= debug_out_internal(15 downto 0);
 
     data_path: datapath
