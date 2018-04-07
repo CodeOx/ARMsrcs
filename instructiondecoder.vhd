@@ -90,7 +90,7 @@ begin
         
     elsif ins(27 downto 26)="01" then
         ins_type<="01";
-        if ins(20)='0' then
+        if ins(20)='1' then
             if ins(22)='0' then
                 ins_subtype <= "000";
             else

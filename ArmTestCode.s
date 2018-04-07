@@ -1,4 +1,7 @@
 @move instructions
+mov r0,#100
+str r0,[r0]
+ldr r1,[r0]
 mov r0,#12
 ldr r1,[r0]
 mov r0,#31
