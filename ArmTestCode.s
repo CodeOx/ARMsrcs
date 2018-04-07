@@ -1,10 +1,8 @@
 @move instructions
 mov r0,#100
 str r0,[r0]
-ldr r1,[r0]
-mov r0,#12
-ldr r1,[r0]
-mov r0,#31
+sub r0,r0,#10
+ldr r1,[r0,#10]!
 mov r1,#20
 
 mvn r2,r0

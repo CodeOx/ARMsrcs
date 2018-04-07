@@ -211,6 +211,8 @@ begin
                 when DT_ldr_writeIntoRF =>
                     if ins24to20(4) = '1' then
                         currentState <= DT_writeBack;
+                    else
+                        currentState <= InstructionFetch_PCincrement;
                     end if;
                     
                 when DT_str_loadRd =>
@@ -222,6 +224,8 @@ begin
                 when DT_str =>
                     if ins24to20(4) = '1' then
                         currentState <= DT_writeBack;
+                    else
+                        currentState <= InstructionFetch_PCincrement;
                     end if;
                     
                 when DT_writeBack =>
