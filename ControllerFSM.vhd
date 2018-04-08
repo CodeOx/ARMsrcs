@@ -71,6 +71,7 @@ architecture Behavioral of ControllerFSM is
         DT_str_memoryWait, --10110
         DT_loadDR_memoryWait1, --10111
         DT_loadDR_memoryWait2, --11000
+        Branch_IncrementPCby4_SavePC, --11001
         Idle --11111
         );
     
@@ -104,6 +105,7 @@ begin
         "10110" when DT_str_memoryWait,
         "10111" when DT_loadDR_memoryWait1,
         "11000" when DT_loadDR_memoryWait2,
+        "11001" when Branch_IncrementPCby4_SavePC,
         "11111" when Idle; --11111
 
     process(clk,reset)
@@ -151,7 +153,10 @@ begin
                         
                     end if;
                     
-                when Branch_IncrementPCby4 => 
+                when Branch_IncrementPCby4 =>
+                    currentState <= Branch_IncrementPCby4_SavePC; 
+                    
+                when Branch_IncrementPCby4_SavePC =>
                     currentState <= Branch_updatePC_addOffset;
                     
                 when Branch_updatePC_addOffset => 

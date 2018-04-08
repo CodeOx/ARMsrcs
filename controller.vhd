@@ -162,7 +162,7 @@ begin
                  else '0';
     
     RFenable <= '1' when state = "00001" or 
-                    (state = "00011" and predicationResult = '1') or 
+                    (state = "11001" and predicationResult = '1') or 
                     (state = "00100" and predicationResult = '1') or
                     (state = "00101" and predicationResult = '1') or 
                     (state = "00111" and predicationResult = '1') or 
@@ -201,7 +201,7 @@ begin
     
     rad2select <= '1' when state = "01110" else '0';
     
-    wadselect <= "11" when state = "00001" or state = "00011" or state = "00100" else
+    wadselect <= "11" when state = "00001" or state = "11001" or state = "00100" else
                  "10" when state = "01100" or state = "10000" else 
                  "00" when state = "00101" else
                  "01";
