@@ -8,7 +8,6 @@ entity datapath is
         carry : in STD_LOGIC;
         memoryReadEnable : in STD_LOGIC;
         memoryWriteEnable : in STD_LOGIC;
-        memoryAddressSelect : in STD_LOGIC;
         IRenable : in STD_LOGIC;
         DRenable : in STD_LOGIC;
         RESenable : in STD_LOGIC;
@@ -25,6 +24,7 @@ entity datapath is
         rad2select : in STD_LOGIC;
         wadselect : in STD_LOGIC_VECTOR(1 downto 0);
         wdselect : in STD_LOGIC;
+        HRdata : in STD_LOGIC_VECTOR(31 downto 0);
         --ShiftType : in STD_LOGIC_VECTOR(1 downto 0);  --read directly from instruction
         ShiftAmountSelect : in STD_LOGIC;
         ShifterInSelect : in STD_LOGIC;
@@ -35,6 +35,8 @@ entity datapath is
         flagN : out STD_LOGIC;
         flagV : out STD_LOGIC;
         flagC : out STD_LOGIC;
+        HWdata : out STD_LOGIC_VECTOR(31 downto 0);
+        Haddr : out STD_LOGIC_VECTOR(15 downto 0);
         debug_controls : in STD_LOGIC_VECTOR(3 downto 0);
         debug_out : out STD_LOGIC_VECTOR(31 downto 0) );
 end datapath;
@@ -155,7 +157,7 @@ begin
     
     debug_out <= debug_out1; 
 
-    memoryAddress <= PC when memoryAddressSelect = '0' else RES;
+    memoryAddress <= PC;
     ins <= IR;
     rad1 <= ins(19 downto 16) when rad1select = "00" else 
             ins(15 downto 12) when rad1select = "01" else
@@ -189,8 +191,10 @@ begin
     shiftType <= "11" when ShifterInSelect = '1' else
                  ins(6 downto 5);             
 
-    PMPathMemoryIn <= dataFromMemory;
-    dataToMemory <= PMPathMemoryOut;
+    PMPathMemoryIn <= HRdata;
+    HWdata <= PMPathMemoryOut;
+    Haddr <= RES(15 downto 0);
+    
     PMPathProcessorIn <= B;
     MemoryWea <= "0000" when memoryWriteEnable = '0' else
                  "0011" when PMPathMode="110" and PMPathByteOffset="00" else
@@ -202,7 +206,7 @@ begin
                  "1111" when memoryWriteEnable = '1';
     MemoryEna <= (memoryReadEnable or memoryWriteEnable);
     
-    memory : bram_wrapper
+    instruction_memory : bram_wrapper
     Port Map (  addra => memoryAddress,
                 clka => clk,
                 rsta => reset,

@@ -39,6 +39,7 @@ entity ControllerFSM is
          ins_type : in STD_LOGIC_VECTOR (1 downto 0);
          ins_subtype : in STD_LOGIC_VECTOR (2 downto 0);
          ins_variant : in STD_LOGIC_VECTOR (1 downto 0);
+         Hready : in STD_LOGIC;
          skip_ins : in STD_LOGIC;
          state : out STD_LOGIC_VECTOR(4 downto 0));
 end ControllerFSM;
@@ -69,8 +70,8 @@ architecture Behavioral of ControllerFSM is
         InstructionFetch_memoryWait, --10100
         InstructionFetch_instructionStore, --10101
         DT_str_memoryWait, --10110
-        DT_loadDR_memoryWait1, --10111
-        DT_loadDR_memoryWait2, --11000
+        DT_loadDR_nonseq, --10111
+        DT_loadDR_idle, --11000
         Branch_IncrementPCby4_SavePC, --11001
         Idle --11111
         );
@@ -103,8 +104,8 @@ begin
         "10100" when InstructionFetch_memoryWait,
         "10101" when InstructionFetch_instructionStore,
         "10110" when DT_str_memoryWait,
-        "10111" when DT_loadDR_memoryWait1,
-        "11000" when DT_loadDR_memoryWait2,
+        "10111" when DT_loadDR_nonseq,
+        "11000" when DT_loadDR_idle,
         "11001" when Branch_IncrementPCby4_SavePC,
         "11111" when Idle; --11111
 
@@ -201,14 +202,18 @@ begin
                     if ins_subtype ="101" or ins_subtype = "111" or ins_subtype = "110" then
                         currentState <= DT_str_loadRd;
                     else
-                        currentState <= DT_loadDR_memoryWait1;
+                        currentState <= DT_loadDR_nonseq;
                     end if;
                     
-                when DT_loadDR_memoryWait1 =>
-                    currentState <= DT_loadDR_memoryWait2;
+                when DT_loadDR_nonseq =>
+                    if Hready = '1' then 
+                        currentState <= DT_loadDR_idle;
+                    end if;
                                     
-                when DT_loadDR_memoryWait2 => 
-                    currentState <= DT_loadDR;
+                when DT_loadDR_idle =>
+                    if Hready = '1' then 
+                        currentState <= DT_loadDR;
+                    end if;
                     
                 when DT_loadDR =>
                     currentState <= DT_ldr_writeIntoRF;
