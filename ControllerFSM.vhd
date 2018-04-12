@@ -69,10 +69,11 @@ architecture Behavioral of ControllerFSM is
         DT_postIndex_CalcAddress, --10011
         InstructionFetch_memoryWait, --10100
         InstructionFetch_instructionStore, --10101
-        DT_str_memoryWait, --10110
+        DT_str_nonseq, --10110
         DT_loadDR_nonseq, --10111
         DT_loadDR_idle, --11000
         Branch_IncrementPCby4_SavePC, --11001
+        DT_str_idle, --11010
         Idle --11111
         );
     
@@ -103,10 +104,11 @@ begin
         "10011" when DT_postIndex_CalcAddress, --10011
         "10100" when InstructionFetch_memoryWait,
         "10101" when InstructionFetch_instructionStore,
-        "10110" when DT_str_memoryWait,
+        "10110" when DT_str_nonseq,
         "10111" when DT_loadDR_nonseq,
         "11000" when DT_loadDR_idle,
         "11001" when Branch_IncrementPCby4_SavePC,
+        "11010" when DT_str_idle,
         "11111" when Idle; --11111
 
     process(clk,reset)
@@ -226,10 +228,17 @@ begin
                     end if;
                     
                 when DT_str_loadRd =>
-                    currentState <= DT_str_memoryWait;
+                    currentState <= DT_str_nonseq;
                     
-                when DT_str_memoryWait =>
-                    currentState <= DT_str;
+                when DT_str_nonseq =>
+                    if Hready = '1' then 
+                        currentState <= DT_str_idle;
+                    end if;
+                    
+                when DT_str_idle => 
+                    if Hready = '1' then 
+                        currentState <= DT_str;
+                    end if;
                     
                 when DT_str =>
                     if ins24to20(4) = '1' then

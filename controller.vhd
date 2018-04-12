@@ -154,11 +154,11 @@ begin
    
     --generating control signals from state and instruction -> combinational
     
-    memoryWriteEnable <= '1' when (state = "01111" or state = "10110") and predicationResult = '1' else '0';
+    memoryWriteEnable <= '0';
     
     IRenable <= '1' when state = "10101" else '0';
     
-    DRenable <= '1' when state = "10001" else '0';
+    DRenable <= '1' when state = "10001" and predicationResult = '1' else '0';
     
     RESenable <= '1' when state = "00000" or state = "00010" or state = "00011" or state = "00110" or state = "01011" or state = "01101" or state = "10011" 
                  else '0';
@@ -210,9 +210,9 @@ begin
     
     wdselect <= '1' when state = "10010" else '0';
     
-    Hwrite <= '0';
+    Hwrite <= '1' when state = "10110" and predicationResult = '1' else '0';
     
-    Htrans <= "10" when state = "10111" else "00";
+    Htrans <= "10" when state = "10111" or state = "10110" else "00";
     
     ShiftAmountSelect <= '1' when (state = "00110" and ins_variant = "01") or state = "01101" else '0';
           
