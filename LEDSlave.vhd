@@ -9,8 +9,8 @@ entity SwitchSlave is
         HTrans : in STD_LOGIC_VECTOR(1 downto 0);        
         HReset : in STD_LOGIC;
         HClock : in STD_LOGIC;
-        HRData : out STD_LOGIC_VECTOR(31 downto 0);
-        Switches : in STD_LOGIC_VECTOR(15 downto 0));
+        HWData : in STD_LOGIC_VECTOR(31 downto 0);
+        LED : out STD_LOGIC_VECTOR(15 downto 0));
 end SwitchSlave;
 
 architecture Behavioral of MemorySlave is
@@ -29,10 +29,9 @@ begin
         elsif rising_edge(HClock) then
             --case curr_state is
             --when IDLE =>
-                if HTrans = "10" and HSel ='1' and HWrite = '0' then
+                if HTrans = "10" and HSel ='1' and HWrite = '1' then
                 --    curr_state <= EXECUTE;
-                    HRData <= "0000000000000000" & Switches;
-                    HReady <= '1';                    
+                    LED <= HWData(15 downto 0);
                 end if;
             --when EXECUTE =>
               --  curr_state <= IDLE;
