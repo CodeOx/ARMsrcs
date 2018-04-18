@@ -18,7 +18,6 @@ entity controller is
       carry : out STD_LOGIC;
       memoryReadEnable : out STD_LOGIC;
       memoryWriteEnable : out STD_LOGIC;
-      memoryAddressSelect : out STD_LOGIC;
       IRenable : out STD_LOGIC;
       DRenable : out STD_LOGIC;
       RESenable : out STD_LOGIC;
@@ -35,12 +34,15 @@ entity controller is
       rad2select : out STD_LOGIC;
       wadselect : out STD_LOGIC_VECTOR(1 downto 0);
       wdselect : out STD_LOGIC;
+      Hwrite : out STD_LOGIC;
+      Htrans : out STD_LOGIC_VECTOR(1 downto 0);
       --ShiftType : in STD_LOGIC_VECTOR(1 downto 0);  --read directly from instruction
       ShiftAmountSelect : out STD_LOGIC;
       ShifterInSelect : out STD_LOGIC;
       Fset : out STD_LOGIC;
       --output to controller :
       instruction : in STD_LOGIC_VECTOR(31 downto 0);
+      Hready : in STD_LOGIC;
       flagZ : in STD_LOGIC;
       flagN : in STD_LOGIC;
       flagV : in STD_LOGIC;
@@ -57,6 +59,7 @@ architecture Behavioral of controller is
            ins_type : in STD_LOGIC_VECTOR (1 downto 0);
            ins_subtype : in STD_LOGIC_VECTOR (2 downto 0);
            ins_variant : in STD_LOGIC_VECTOR (1 downto 0);
+           Hready : in STD_LOGIC;
            skip_ins : in STD_LOGIC;
            state : out STD_LOGIC_VECTOR(4 downto 0));
     end Component;
@@ -111,6 +114,7 @@ begin
                ins_type => ins_type,
                ins_subtype => ins_subtype,
                ins_variant => ins_variant,
+               Hready => Hready,
                skip_ins => skip_ins,
                state => state);
              
@@ -150,13 +154,11 @@ begin
    
     --generating control signals from state and instruction -> combinational
     
-    memoryWriteEnable <= '1' when (state = "01111" or state = "10110") and predicationResult = '1' else '0';
-    
-    memoryAddressSelect <= '0' when state = "00000" or state = "10100" else '1';
+    memoryWriteEnable <= '0';
     
     IRenable <= '1' when state = "10101" else '0';
     
-    DRenable <= '1' when state = "10001" else '0';
+    DRenable <= '1' when state = "10001" and predicationResult = '1' else '0';
     
     RESenable <= '1' when state = "00000" or state = "00010" or state = "00011" or state = "00110" or state = "01011" or state = "01101" or state = "10011" 
                  else '0';
@@ -207,6 +209,10 @@ begin
                  "01";
     
     wdselect <= '1' when state = "10010" else '0';
+    
+    Hwrite <= '1' when state = "10110" and predicationResult = '1' else '0';
+    
+    Htrans <= "10" when state = "10111" or state = "10110" else "00";
     
     ShiftAmountSelect <= '1' when (state = "00110" and ins_variant = "01") or state = "01101" else '0';
           

@@ -6,6 +6,16 @@ entity processor is
   Port( clk: in STD_LOGIC;
         reset: in STD_LOGIC;
         start: in STD_LOGIC;
+        
+        Hready : in STD_LOGIC; --
+        HRdata : in STD_LOGIC_VECTOR(31 downto 0); --
+        
+        Hwrite : out STD_LOGIC; --
+        Haddr : out STD_LOGIC_VECTOR(15 downto 0); --
+        Hsize : out STD_LOGIC_VECTOR(2 downto 0); --
+        Htrans : out STD_LOGIC_VECTOR(1 downto 0); --
+        HWdata : out STD_LOGIC_VECTOR(31 downto 0); --
+        
         debug_controls : in STD_LOGIC_VECTOR(3 downto 0);
         debug_out : out STD_LOGIC_VECTOR(15 downto 0));
         --state : out STD_LOGIC_VECTOR(4 downto 0) );
@@ -22,7 +32,6 @@ architecture Behavioral of processor is
           carry : out STD_LOGIC;
           memoryReadEnable : out STD_LOGIC;
           memoryWriteEnable : out STD_LOGIC;
-          memoryAddressSelect : out STD_LOGIC;
           IRenable : out STD_LOGIC;
           DRenable : out STD_LOGIC;
           RESenable : out STD_LOGIC;
@@ -39,12 +48,15 @@ architecture Behavioral of processor is
           rad2select : out STD_LOGIC;
           wadselect : out STD_LOGIC_VECTOR(1 downto 0);
           wdselect : out STD_LOGIC;
+          Hwrite : out STD_LOGIC;
+          Htrans : out STD_LOGIC_VECTOR(1 downto 0);
           --ShiftType : in STD_LOGIC_VECTOR(1 downto 0);  --read directly from instruction
           ShiftAmountSelect : out STD_LOGIC;
           ShifterInSelect : out STD_LOGIC;
           Fset : out STD_LOGIC;
           --output to controller :
           instruction : in STD_LOGIC_VECTOR(31 downto 0);
+          Hready : in STD_LOGIC;
           flagZ : in STD_LOGIC;
           flagN : in STD_LOGIC;
           flagV : in STD_LOGIC;
@@ -59,7 +71,6 @@ architecture Behavioral of processor is
             carry : in STD_LOGIC;
             memoryReadEnable : in STD_LOGIC;
             memoryWriteEnable : in STD_LOGIC;
-            memoryAddressSelect : in STD_LOGIC;
             IRenable : in STD_LOGIC;
             DRenable : in STD_LOGIC;
             RESenable : in STD_LOGIC;
@@ -76,6 +87,7 @@ architecture Behavioral of processor is
             rad2select : in STD_LOGIC;
             wadselect : in STD_LOGIC_VECTOR(1 downto 0);
             wdselect : in STD_LOGIC;
+            HRdata : in STD_LOGIC_VECTOR(31 downto 0);
             --ShiftType : in STD_LOGIC_VECTOR(1 downto 0);  --read directly from instruction
             ShiftAmountSelect : in STD_LOGIC;
             ShifterInSelect : in STD_LOGIC;
@@ -86,6 +98,8 @@ architecture Behavioral of processor is
             flagN : out STD_LOGIC;
             flagV : out STD_LOGIC;
             flagC : out STD_LOGIC;
+            HWdata : out STD_LOGIC_VECTOR(31 downto 0);
+            Haddr : out STD_LOGIC_VECTOR(15 downto 0);
             debug_controls : in STD_LOGIC_VECTOR(3 downto 0);
             debug_out : out STD_LOGIC_VECTOR(31 downto 0));
             
@@ -94,7 +108,6 @@ architecture Behavioral of processor is
     signal carry :  STD_LOGIC;
     signal memoryReadEnable :  STD_LOGIC;
     signal memoryWriteEnable :  STD_LOGIC;
-    signal memoryAddressSelect :  STD_LOGIC;
     signal IRenable :  STD_LOGIC;
     signal DRenable :  STD_LOGIC;
     signal RESenable :  STD_LOGIC;
@@ -132,16 +145,17 @@ begin
 	   end if;
 	end process;
     
-    slowclock<= slowclockvector(0);
+    slowclock<= slowclockvector(26);
     debug_out <= debug_out_internal(15 downto 0);
+    
+    Hsize <= "010";
 
     data_path: datapath
     Port Map(reset => reset,
-            clk => clk,
+            clk => slowclock,
             carry => carry,
             memoryReadEnable => memoryReadEnable,
             memoryWriteEnable => memoryWriteEnable,
-            memoryAddressSelect => memoryAddressSelect,
             IRenable => IRenable,
             DRenable => DRenable,
             RESenable => RESenable,
@@ -158,6 +172,7 @@ begin
             rad2select => rad2select,
             wadselect => wadselect,
             wdselect => wdselect,
+            HRdata => HRdata,
             ShiftAmountSelect => ShiftAmountSelect,
             ShifterInSelect => ShifterSelect,
             Fset => Fset,
@@ -166,17 +181,18 @@ begin
             flagN => flagN,
             flagV => flagV,
             flagC => flagC,
+            HWdata => HWdata,
+            Haddr => Haddr,
             debug_controls => debug_controls,
             debug_out => debug_out_internal);
             
     processor_controller: controller
     Port Map(reset => reset,
-            clk => clk,
+            clk => slowclock,
             start => start,
             carry => carry,
             memoryReadEnable => memoryReadEnable,
             memoryWriteEnable => memoryWriteEnable,
-            memoryAddressSelect => memoryAddressSelect,
             IRenable => IRenable,
             DRenable => DRenable,
             RESenable => RESenable,
@@ -193,10 +209,13 @@ begin
             rad2select => rad2select,
             wadselect => wadselect,
             wdselect => wdselect,
+            Hwrite => Hwrite,
+            Htrans => Htrans,
             ShiftAmountSelect => ShiftAmountSelect,
             ShifterInSelect => ShifterSelect,
             Fset => Fset,
             instruction => instruction,
+            Hready => Hready,
             flagZ => flagZ,
             flagN => flagN,
             flagV => flagV,

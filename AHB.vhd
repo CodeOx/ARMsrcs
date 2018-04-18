@@ -32,17 +32,17 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity AHB is
-    Port(  HreadyToMaster : out STD_LOGIC;
-        dataToMaster : out STD_LOGIC_VECTOR(31 downto 0);
+    Port(  HreadyToMaster : out STD_LOGIC; --
+        dataToMaster : out STD_LOGIC_VECTOR(31 downto 0); --
         
-        addressFromMaster : in STD_LOGIC_VECTOR(31 downto 0);
-        dataFromMaster : in STD_LOGIC_VECTOR(31 downto 0);
-        HwriteFromMaster : in STD_LOGIC;
-        HsizeFromMaster : in STD_LOGIC_VECTOR(2 downto 0);
+        addressFromMaster : in STD_LOGIC_VECTOR(31 downto 0); --
+        dataFromMaster : in STD_LOGIC_VECTOR(31 downto 0); --
+        HwriteFromMaster : in STD_LOGIC; --
+        HsizeFromMaster : in STD_LOGIC_VECTOR(2 downto 0); 
         HtransFromMaster : in STD_LOGIC_VECTOR(1 downto 0);
         
-        HselToSlave_memory : out STD_LOGIC;
-        addressToSlave : out STD_LOGIC_VECTOR(31 downto 0);
+        HselToSlave_memory : out STD_LOGIC; 
+        addressToSlave : out STD_LOGIC_VECTOR(31 downto 0); 
         dataToSlave : out STD_LOGIC_VECTOR(31 downto 0);
         HwriteToSlave : out STD_LOGIC;
         HsizeToSlave : out STD_LOGIC_VECTOR(2 downto 0);
