@@ -47,7 +47,8 @@ entity AHB is
         HwriteToSlave : out STD_LOGIC;
         HsizeToSlave : out STD_LOGIC_VECTOR(2 downto 0);
         HtransToSlave : out STD_LOGIC_VECTOR(1 downto 0);
-        
+        HresetToSlave : in STD_LOGIC;
+        HclockToSlave : in STD_LOGIC;
         HreadyFromSlave_memory : in STD_LOGIC;
         dataFromSlave_memory : in STD_LOGIC_VECTOR(31 downto 0));
 end AHB;

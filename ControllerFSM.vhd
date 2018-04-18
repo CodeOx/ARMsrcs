@@ -144,7 +144,7 @@ begin
                         elsif (ins_type = "01" and ins24to20(4) = '0') then
                             currentState <= DT_postIndex_CalcAddress;
                         elsif ins_type = "10" then
-                            currentState <= MulMla_LoadRs;
+                            currentState <= MulMla_LoadRn;
                         elsif ins_type = "11" then
                             currentState <= Branch_IncrementPCby4;
                         else
@@ -182,13 +182,13 @@ begin
                 when DP_writeBack =>
                     currentState <= InstructionFetch_PCincrement;                    
                     
-                when MulMla_loadRs =>
+                when MulMla_loadRn =>
                     currentState <= MulMla_updateM;
                     
                 when MulMla_updateM =>
-                    currentState <= MulMla_loadRn;
+                    currentState <= MulMla_loadRs;
                     
-                when MulMla_loadRn =>
+                when MulMla_loadRs =>
                     currentState <= MulMla_updateRES_flags;
                     
                 when MulMla_updateRES_flags =>
