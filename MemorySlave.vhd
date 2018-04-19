@@ -74,6 +74,7 @@ begin
                     curr_state <= IDLE;
                     HReady <= '1';
                     HRData <= mem_data;
+                    mem_write_enable <= "0000";
             when others => curr_state <= IDLE;
             end case;
             
