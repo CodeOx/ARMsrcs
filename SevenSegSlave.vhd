@@ -1,7 +1,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
-entity LEDSlave is
+entity SevenSegSlave is
    Port(Hsel : in STD_LOGIC;
         Haddress : in STD_LOGIC_VECTOR(15 downto 0);
         HWrite : in STD_LOGIC;
@@ -10,10 +10,10 @@ entity LEDSlave is
         HReset : in STD_LOGIC;
         HClock : in STD_LOGIC;
         HWData : in STD_LOGIC_VECTOR(31 downto 0);
-        LED : out STD_LOGIC_VECTOR(15 downto 0));
-end SwitchSlave;
+        SevenSegData : out STD_LOGIC_VECTOR(15 downto 0));
+end SevenSegSlave;
 
-architecture Behavioral of LEDSlave is
+architecture Behavioral of SevenSegSlave is
 
     Type State is (
         IDLE,
@@ -31,7 +31,7 @@ begin
             --when IDLE =>
                 if HTrans = "10" and HSel ='1' and HWrite = '1' then
                 --    curr_state <= EXECUTE;
-                    LED <= HWData(15 downto 0);
+                    SevenSegData <= HWData(15 downto 0);
                 end if;
             --when EXECUTE =>
               --  curr_state <= IDLE;
