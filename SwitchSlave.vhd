@@ -13,7 +13,7 @@ entity SwitchSlave is
         Switches : in STD_LOGIC_VECTOR(15 downto 0));
 end SwitchSlave;
 
-architecture Behavioral of MemorySlave is
+architecture Behavioral of SwitchSlave is
 
     Type State is (
         IDLE,

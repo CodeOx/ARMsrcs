@@ -11,7 +11,7 @@ entity SevenSegSlave is
         HClock : in STD_LOGIC;
         HWData : in STD_LOGIC_VECTOR(31 downto 0);
         anode : out STD_LOGIC_VECTOR (3 downto 0);
-        cathode : out STD_LOGIC_VECTOR (6 downto 0)););
+        cathode : out STD_LOGIC_VECTOR (6 downto 0));
 end SevenSegSlave;
 
 architecture Behavioral of SevenSegSlave is
