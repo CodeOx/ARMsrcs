@@ -10,16 +10,36 @@ entity SevenSegSlave is
         HReset : in STD_LOGIC;
         HClock : in STD_LOGIC;
         HWData : in STD_LOGIC_VECTOR(31 downto 0);
-        SevenSegData : out STD_LOGIC_VECTOR(15 downto 0));
+        anode : out STD_LOGIC_VECTOR (3 downto 0);
+        cathode : out STD_LOGIC_VECTOR (6 downto 0)););
 end SevenSegSlave;
 
 architecture Behavioral of SevenSegSlave is
+
+        
+    signal SevenSegData : STD_LOGIC_VECTOR(15 downto 0);
 
     Type State is (
         IDLE,
         EXECUTE
     );
+
+    component seven_seg_display is
+    Port ( clk : in STD_LOGIC;
+           b : in STD_LOGIC_VECTOR(15 downto 0);
+           anode : out STD_LOGIC_VECTOR (3 downto 0);
+           cathode : out STD_LOGIC_VECTOR (6 downto 0));
+    end component;
 begin
+    
+    ssd : seven_seg_display
+    Port Map 
+    (
+        clk => HClock,
+        b => SevenSegData,
+        anode => anode,
+        cathode => cathode
+    );
 
     process(HClock,HReset)
     begin
