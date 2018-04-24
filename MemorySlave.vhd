@@ -63,6 +63,8 @@ begin
                     mem_address <= "0000000000000000" & Haddress;
                     HReady<='0';
                     mem_write_enable <= HWrite & HWrite & HWrite & HWrite;
+                else
+                    HReady <= '1';
                 end if;
             when WAIT1 =>
                     curr_state <= WAIT2;
@@ -72,6 +74,7 @@ begin
                     curr_state <= IDLE;
                     HReady <= '1';
                     HRData <= mem_data;
+                    mem_write_enable <= "0000";
             when others => curr_state <= IDLE;
             end case;
             

@@ -17,7 +17,8 @@ entity processor is
         HWdata : out STD_LOGIC_VECTOR(31 downto 0); --
         
         debug_controls : in STD_LOGIC_VECTOR(3 downto 0);
-        debug_out : out STD_LOGIC_VECTOR(15 downto 0));
+        debug_out : out STD_LOGIC_VECTOR(15 downto 0);
+        ins_out : out STD_LOGIC_VECTOR(31 downto 0));
         --state : out STD_LOGIC_VECTOR(4 downto 0) );
 end processor;
 
@@ -147,12 +148,13 @@ begin
     
     slowclock<= slowclockvector(26);
     debug_out <= debug_out_internal(15 downto 0);
+    ins_out <= instruction;
     
     Hsize <= "010";
 
     data_path: datapath
     Port Map(reset => reset,
-            clk => slowclock,
+            clk => clk,
             carry => carry,
             memoryReadEnable => memoryReadEnable,
             memoryWriteEnable => memoryWriteEnable,
@@ -188,7 +190,7 @@ begin
             
     processor_controller: controller
     Port Map(reset => reset,
-            clk => slowclock,
+            clk => clk,
             start => start,
             carry => carry,
             memoryReadEnable => memoryReadEnable,
