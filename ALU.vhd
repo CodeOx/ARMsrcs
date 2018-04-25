@@ -85,7 +85,7 @@ begin
     flagZ <= not (temp_or (31));
     flagN <= temp_output(31);
     --flagV <= c31 xor c32;
-    flagV <=  temp_output(31) when (unsigned(operand1) >= unsigned(operand2)) else not temp_output(31);
+    flagV <=  temp_output(31) when ((operand1) >= (operand2)) else not temp_output(31);
     flagC <= c32;
 
 end Behavioral;
