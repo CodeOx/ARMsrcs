@@ -70,8 +70,9 @@ begin
         (not operand2) when others;
         
         
-    c31 <= operand1(31) xor operand2(31) xor temp_output(31);
-    c32 <= (operand1(31) and operand2(31)) or (operand2(31) and temp_output(31)) or (temp_output(31) and operand1(31)); 
+    c31 <= operand1(31) xor (not(operand2(31))) xor temp_output(31) when mode ="1010" else operand1(31) xor (operand2(31)) xor temp_output(31);
+    c32 <=(operand1(31) and (not(operand2(31)))) or (not(operand2(31)) and temp_output(31)) or (temp_output(31) and operand1(31)) when mode = "1010" 
+        else (operand1(31) and operand2(31)) or (operand2(31) and temp_output(31)) or (temp_output(31) and operand1(31)); 
     output <= temp_output;
     
     --for or of all bits in output
@@ -83,7 +84,8 @@ begin
     
     flagZ <= not (temp_or (31));
     flagN <= temp_output(31);
-    flagV <= c31 xor c32;
+    --flagV <= c31 xor c32;
+    flagV <=  temp_output(31) when (unsigned(operand1) >= unsigned(operand2)) else not temp_output(31);
     flagC <= c32;
 
 end Behavioral;

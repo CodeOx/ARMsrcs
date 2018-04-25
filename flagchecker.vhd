@@ -38,7 +38,7 @@ result <=  Z when "0000",
            N xnor V when "1010",
            N xor V when "1011",
            not(Z) and (N xnor V) when "1100",
-           Z and (N xor V) when "1101",
+           Z or (N xor V) when "1101",
            '1' when others;
 undefined <= condition(0) and condition(1) and condition(2) and condition(3);                   
 

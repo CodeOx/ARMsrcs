@@ -44,6 +44,17 @@ begin
 process (ins)
 begin
     if ins(27 downto 26)="00" then
+        if ins(25) = '1'then
+            ins_type <= "00";
+            ins_variant <="00";
+            if ins(24 downto 23)="10" then
+                ins_subtype<="000";
+            else
+                ins_subtype <="001";
+            end if;
+        
+        
+        else
         if ins(7 downto 4)="1001" then
             ins_type<= "10";
             undefined_encoding <= ins(23) or ins(24);
@@ -86,6 +97,7 @@ begin
                 ins_subtype <="001";
             end if;
             
+        end if;
         end if;
         
     elsif ins(27 downto 26)="01" then

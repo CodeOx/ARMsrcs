@@ -147,6 +147,7 @@ begin
                 
     undefined_ins <= undefined_encoding or undefined_predication;
     skip_ins <= undefined_ins; 
+    --skip_ins <= '0';
     
     --carry : out STD_LOGIC;            
             
