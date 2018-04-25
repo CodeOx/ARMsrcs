@@ -32,7 +32,7 @@ architecture Behavioral of seven_seg_display is
             count<=count+1;
         end if;
     end process;
-    redclock<=count(17); 
+    redclock<=count(18); 
     
     process(redclock)
     begin

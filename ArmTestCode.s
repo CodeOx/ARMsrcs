@@ -4,6 +4,10 @@ str r0,[r0]
 sub r0,r0,#10
 ldr r1,[r0,#10]!
 mov r1,#20
+mov r0,#0
+ldr r1,[r0,#4092] @load from swithces
+str r1,[r0,#4093] @output to LED
+str r1,[r0,#4094] @output to LED
 
 
 @branch testing

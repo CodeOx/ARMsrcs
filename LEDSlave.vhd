@@ -25,13 +25,14 @@ begin
     begin
         if HReset = '1' then 
             --curr_state<=IDLE;
-            HReady <= '0';
+            HReady <= '1';
         elsif rising_edge(HClock) then
             --case curr_state is
             --when IDLE =>
                 if HTrans = "10" and HSel ='1' and HWrite = '1' then
                 --    curr_state <= EXECUTE;
                     LED <= HWData(15 downto 0);
+                    HReady <= '1';
                 end if;
             --when EXECUTE =>
               --  curr_state <= IDLE;
