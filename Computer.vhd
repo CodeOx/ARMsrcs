@@ -35,6 +35,10 @@ entity Computer is
   Port ( clk : in STD_LOGIC;
          reset : in STD_LOGIC;
          start : in STD_LOGIC;
+         switches : in STD_LOGIC_VECTOR(15 downto 0);
+         LEDout : out STD_LOGIC_VECTOR(15 downto 0);
+         anodeOut : out STD_LOGIC_VECTOR (3 downto 0);
+         cathodeOut : out STD_LOGIC_VECTOR (6 downto 0);
          debug_controls : in STD_LOGIC_VECTOR(3 downto 0);
          debug_out : out STD_LOGIC_VECTOR(15 downto 0) );
 end Computer;
@@ -73,19 +77,89 @@ architecture Behavioral of Computer is
             HReady : out STD_LOGIC;
             HRData : out STD_LOGIC_VECTOR(31 downto 0));
     end component;
+    
+    component SwitchSlave is
+       Port(Hsel : in STD_LOGIC;
+            Haddress : in STD_LOGIC_VECTOR(15 downto 0);
+            HWrite : in STD_LOGIC;
+            HReady : out STD_LOGIC;
+            HTrans : in STD_LOGIC_VECTOR(1 downto 0);        
+            HReset : in STD_LOGIC;
+            HClock : in STD_LOGIC;
+            HRData : out STD_LOGIC_VECTOR(31 downto 0);
+            Switches : in STD_LOGIC_VECTOR(15 downto 0));
+    end component;
+    
+    component LEDSlave is
+       Port(Hsel : in STD_LOGIC;
+            Haddress : in STD_LOGIC_VECTOR(15 downto 0);
+            HWrite : in STD_LOGIC;
+            HReady : out STD_LOGIC;
+            HTrans : in STD_LOGIC_VECTOR(1 downto 0);        
+            HReset : in STD_LOGIC;
+            HClock : in STD_LOGIC;
+            HWData : in STD_LOGIC_VECTOR(31 downto 0);
+            LED : out STD_LOGIC_VECTOR(15 downto 0));
+    end component;
+    
+    component SevenSegSlave is
+       Port(Hsel : in STD_LOGIC;
+            Haddress : in STD_LOGIC_VECTOR(15 downto 0);
+            HWrite : in STD_LOGIC;
+            HReady : out STD_LOGIC;
+            HTrans : in STD_LOGIC_VECTOR(1 downto 0);        
+            HReset : in STD_LOGIC;
+            HClock : in STD_LOGIC;
+            HWData : in STD_LOGIC_VECTOR(31 downto 0);
+            anode : out STD_LOGIC_VECTOR (3 downto 0);
+            cathode : out STD_LOGIC_VECTOR (6 downto 0));
+    end component;
+
 
     signal HReadyToProcessor : STD_LOGIC;
     signal HReadyFromMemory : STD_LOGIC;
+    signal HReadyFromSwitch : STD_LOGIC;
+    signal HReadyFromLED : STD_LOGIC;
+    signal HReadyFromSevenSeg : STD_LOGIC;
+    
     signal dataToProcessor : STD_LOGIC_VECTOR(31 downto 0);
     signal dataFromProcessor : STD_LOGIC_VECTOR(31 downto 0);
     signal HWrite : STD_LOGIC;
     signal Haddr : STD_LOGIC_VECTOR(15 downto 0);
     signal HSize : STD_LOGIC_VECTOR(2 downto 0);
     signal HTrans : STD_LOGIC_VECTOR(1 downto 0);
+    
     signal dataFromMemory : STD_LOGIC_VECTOR(31 downto 0);
+    signal dataFromSwitch : STD_LOGIC_VECTOR(31 downto 0);
+
     signal instruction : STD_LOGIC_VECTOR(31 downto 0);
+    
+    signal HselMemory : STD_LOGIC;
+    signal HselSwitch : STD_LOGIC;
+    signal HselLED : STD_LOGIC;
+    signal HselSevenSeg : STD_LOGIC;
+    
+    signal selectSlave : STD_LOGIC_VECTOR(2 downto 0); --000 : memory, 001 -> Switch, 010 -> LED, 011 -> 7seg
 
 begin
+
+    selectSlave <= "001" when Haddr = "1111111111111100" else
+                   "010" when Haddr = "1111111111111101" else
+                   "011" when Haddr = "1111111111111110" or Haddr = "1111111111111111" else
+                   "000";
+    
+    HReadyToProcessor <= HReadyFromSwitch when selectSlave = "001" else
+                         HReadyFromLED when selectSlave = "010" else
+                         HReadyFromSevenSeg when selectSlave = "011"
+                         else HReadyFromMemory;
+    
+    dataToProcessor <= dataFromSwitch when selectSlave = "001" else dataFromMemory; 
+
+    HselMemory <= '1' when selectSlave = "000" else '0';
+    HselSwitch <= '1' when selectSlave = "001" else '0';
+    HselLED <= '1' when selectSlave = "010" else '0';
+    HselSevenSeg <= '1' when selectSlave = "011" else '0';
+
 
     main_processor : processor
       Port Map(   clk => clk,
@@ -106,7 +180,7 @@ begin
                   ins_out => instruction);
                   
     memory : MemorySlave
-     Port Map(Hsel => '1',
+     Port Map(Hsel => HselMemory,
           Haddress => Haddr,
           HWData => dataFromProcessor,
           HWrite => HWrite,
@@ -116,8 +190,40 @@ begin
           HClock => clk,
           HReady => HReadyFromMemory,
           HRData => dataFromMemory);
-
-    HReadyToProcessor <= HReadyFromMemory;
-    dataToProcessor <= dataFromMemory;    
+    
+    switch : SwitchSlave
+    Port Map(Hsel => HselSwitch,
+          Haddress => Haddr,
+          HWrite => HWrite,
+          HReady => HReadyFromSwitch,
+          HTrans => HTrans,        
+          HReset => reset,
+          HClock => clk,
+          HRData => dataFromSwitch,
+          Switches => switches);
+          
+    LED : LEDSlave
+     Port Map(Hsel => HselLED,
+          Haddress => Haddr,
+          HWrite => HWrite,
+          HReady => HReadyFromLED,
+          HTrans => HTrans,        
+          HReset => reset,
+          HClock => clk,
+          HWData => dataFromProcessor,
+          LED => LEDout);
+          
+    sevenSeg : SevenSegSlave
+     Port Map(Hsel => HselSevenSeg,
+          Haddress => Haddr,
+          HWrite => HWrite,
+          HReady => HReadyFromSevenSeg,
+          HTrans => HTrans,        
+          HReset => reset,
+          HClock => clk,
+          HWData => dataFromProcessor,
+          anode => anodeOut,
+          cathode => cathodeOut);
+   
 
 end Behavioral;

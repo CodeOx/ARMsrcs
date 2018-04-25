@@ -11,7 +11,7 @@ entity LEDSlave is
         HClock : in STD_LOGIC;
         HWData : in STD_LOGIC_VECTOR(31 downto 0);
         LED : out STD_LOGIC_VECTOR(15 downto 0));
-end SwitchSlave;
+end LEDSlave;
 
 architecture Behavioral of LEDSlave is
 
