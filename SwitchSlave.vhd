@@ -25,7 +25,7 @@ begin
     begin
         if HReset = '1' then 
             --curr_state<=IDLE;
-            HReady <= '0';
+            HReady <= '1';
         elsif rising_edge(HClock) then
             --case curr_state is
             --when IDLE =>
