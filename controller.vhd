@@ -218,7 +218,7 @@ begin
           
     ShifterInSelect <= '1' when (state = "00110" and ins_variant = "00") else '0';
     
-    Fset <= '1' when (state = "00110" and predicationResult = '1') or (state = "01011" and predicationResult = '1') else '0'; 
+    Fset <= '1' when (state = "00110" and predicationResult = '1' and ins_subtype = "000") or (state = "01011" and predicationResult = '1') else '0'; 
 
 
 end Behavioral;
